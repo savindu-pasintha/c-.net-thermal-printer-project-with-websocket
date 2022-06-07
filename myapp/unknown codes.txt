@@ -1,0 +1,134 @@
+using PrinterUtility;
+using System.Text;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.ComponentModel;
+using ESCPOS_NET;
+using ESCPOS_NET.Emitters;
+using ESCPOS_NET.Utilities;
+
+namespace pos
+{
+    public partial class Form1 : Form
+    {
+        //https://isolasoftware.it/2012/05/04/how-to-send-live-data-from-a-c-desktop-application-to-web-using-websockets/
+        static SerialPrinter printer;
+        static ICommandEmitter ic;
+        static void StatusChanged(Object sender,EventArgs ps)
+        {
+            var status = (PrinterStatusEventArgs)ps;
+            Console.WriteLine($"Status: {status.IsPrinterOnline}");
+            Console.WriteLine($"Has Paper? {status.IsPaperOut}");
+            Console.WriteLine($"Paper Running Low? {status.IsPaperLow}");
+            Console.WriteLine($"Cash Drawer Open? {status.IsCashDrawerOpen}");
+            Console.WriteLine($"Cover Open? {status.IsCoverOpen}");
+            //Console.WriteLine(JsonConvert.SerializeObject(status));
+        }
+
+        static void setup()
+        {
+            printer.Write(ic.Initialize());
+            printer.Write(ic.Enable());
+            printer.Write(ic.EnableAutomaticInkStatusBack());
+            printer.StatusChanged += StatusChanged;
+
+
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        
+       
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // USB, Bluetooth, or Serial
+            printer = new SerialPrinter(portName: "EPSON XP-710 Series", baudRate: 115200);
+            ic = new EPSON();
+            //printer.StartMonitoring();
+            setup();
+            /*
+            PrinterUtility.EscPosEpsonCommands.EscPosEpson obj = new PrinterUtility.EscPosEpsonCommands.EscPosEpson();
+
+            //own logo create
+            //var BytesValues = GetLogo(@"D:/logo.bmp");
+
+            var BytesValue = Encoding.ASCII.GetBytes(string.Empty);
+            //works fine
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("English Text"));
+            //Arabic Charecter, prints as ???
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes(String.Format("{0,-25}", "تيست")));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.DoubleWidth6());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Center());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Title\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.DoubleWidth4());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Sub Title\n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.CharSize.Nomarl());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invice \n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Left());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invice ID : 12 \n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invice P : 1 \n")); 
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invice Date : 2020-10-12 \n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Invice \n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.FontSelect.FontA());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Right());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, Encoding.ASCII.GetBytes("Total : 2000.00 \n"));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Separator());
+            BytesValue = PrintExtensions.AddBytes(BytesValue, obj.Alignment.Center());
+           // BytesValue = PrintExtensions.AddBytes(BytesValue, obj.BarCode.Code128("1233333"));
+           // BytesValue = PrintExtensions.AddBytes(BytesValue, obj.QrCode.Print("1233333",PrinterUtility.Enums.QrCodeSize.Medio));
+            BytesValue = PrintExtensions.AddBytes(BytesValue, CutPage());
+            //acces
+            // computer name = DESKTOP-KAEOQ5A
+            //printer name port = EPSON XP-710 Series
+            //project ek right click kl properties wl setting wl
+            // pos.Properties.Settings.Default.PrinterPath = \\\\\DESKTOP-KAEOQ5A\\EPSON XP-710 Series
+            PrinterUtility.PrintExtensions.Print(BytesValue,"\\\\\DESKTOP-KAEOQ5A\\EPSON XP-710 Series");
+           */
+
+
+        }
+        public byte[] CutPage() {
+            List<byte> oby = new List<byte>();
+            oby.Add(Convert.ToByte(Convert.ToChar(0x1D)));
+            oby.Add(Convert.ToByte('V'));
+            oby.Add((byte)66);
+            oby.Add((byte)3);
+            return oby.ToArray();
+        }
+        /*
+        public byte[] GetLogo(string Logopath) {
+            List<byte> byteList = new List<byte>();
+if (!File.Exists(LogoPath))
+                retun Null;
+            Bitmapdata data = GetBitmapData(LogoPath);
+            BitArray doits = data.Dots;
+            byte[] width = BitConverter.getBytes(data.Width);
+
+            int offset = 0;
+            MemoryStream = new MemoryStream();
+            //BinaryWriter bw = new binaryWriter(stream);
+            byteList.Add(Convert.ToByte(Convert.ToChar(0x1B)));
+            byteList.Add(Convert.ToByte('@'));
+            byteList.Add(Convert.ToByte(Convert.ToChar(0x1B)));
+            byteList.Add(Convert.ToByte('3'));
+            byteList.Add((byte)24);
+        }
+        public BitmapData GetBitmapData(string bmpFileName) { }
+
+        public class BitmapData
+        {
+            public BitmapArray Dots { get; set; }
+            public int Height() { }
+        }
+        */
+    }
+}

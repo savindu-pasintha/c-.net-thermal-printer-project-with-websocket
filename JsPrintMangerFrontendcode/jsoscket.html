@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+</head>
+<body>
+    <button onclick="print();" id="btn">click</button>
+</body>
+<script type="text/Javascript">
+  
+   function print(o){
+      WebSocketTest();
+   }
+   function WebSocketTest() {
+            
+            if ("WebSocket" in window) {
+               console.log("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               var url="ws://127.0.0.1:7890/POSMSGES";
+               var ws = new WebSocket(url);
+              	
+               ws.onopen = function() {
+                console.log("Message is sent...");
+                  // Web Socket is connected, send data using send()
+                 var count = 0;
+                  setInterval(()=>{
+                      //"MSG from web : "+count+" "+
+                    ws.send({'name':'savindu','id':count} );
+                    count = count+1;
+                  },1000);
+                  
+                  
+               };
+				
+               ws.onmessage = function (evt) { 
+                  var received_msg = evt.data;
+                  console.log("Message is received...");
+               };
+				
+               ws.onclose = function() { 
+                  
+                  // websocket is closed.
+                  console.log("Connection is closed..."); 
+               };
+            } else {
+              
+               // The browser doesn't support WebSocket
+               console.log("WebSocket NOT supported by your Browser!");
+            }
+         }
+</script>
+</html>
