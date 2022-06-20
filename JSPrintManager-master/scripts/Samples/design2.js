@@ -185,6 +185,8 @@
         return nm + n;
       }
 
+
+      /*English*/
       var cmds = esc + '@' //Initializes the printer (ESC @)
       cmds += esc + '!' + '\x38' //Emphasized + Double-height + Double-width mode selected (ESC ! (8 + 16 + 32)) 56 dec => 38 hex
       cmds += newLine + 'Logo/Brand' //text to print
